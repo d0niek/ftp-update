@@ -8,8 +8,8 @@ $user = '';
 echo "FTP connecting ...\n";
 $ftp = ftp_init($server, $user, $pass);
 if (!$ftp) {
-	echo "Error ftp init\n";
-	exit();
+    echo "Error ftp init\n";
+    exit();
 }
 
 $source_path = 'source/trunk';
@@ -32,17 +32,17 @@ $files = modifiedFiles($source_path, $lastUpdate, $execute);
 
 echo "Backup old files and update newer ...\n";
 foreach ($files as $file) {
-	$ftpFiles = substr($file, strlen($source_path));
+    $ftpFiles = substr($file, strlen($source_path));
 
-	if (ftp_getFile($ftp, "$backupDir$ftpFiles", $ftpFiles, FTP_ASCII)) {
-		echo "	Backup << $ftpFiles\n";
-		file_put_contents("$backupDir/backup.log", "Backup: $ftpFiles\n", FILE_APPEND);
-	}
+    if (ftp_getFile($ftp, "$backupDir$ftpFiles", $ftpFiles, FTP_ASCII)) {
+        echo "    Backup << $ftpFiles\n";
+        file_put_contents("$backupDir/backup.log", "Backup: $ftpFiles\n", FILE_APPEND);
+    }
 
-	if (ftp_putFile($ftp, $ftpFiles, "$source_path$ftpFiles", FTP_ASCII)) {
-		echo "	Update >> $source_path$ftpFiles\n";
-		file_put_contents("$backupDir/backup.log", "Update: $source_path$ftpFiles\n", FILE_APPEND);
-	}
+    if (ftp_putFile($ftp, $ftpFiles, "$source_path$ftpFiles", FTP_ASCII)) {
+        echo "    Update >> $source_path$ftpFiles\n";
+        file_put_contents("$backupDir/backup.log", "Update: $source_path$ftpFiles\n", FILE_APPEND);
+    }
 }
 
 // Update time
