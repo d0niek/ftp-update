@@ -22,11 +22,11 @@ class Ftp
     /** @var string $password */
     private $password;
 
-    /** @var resource $ftp FTP stream */
-    private $ftp;
-
     /** @var bool $passiveMode */
     private $passiveMode = false;
+
+    /** @var resource $ftp FTP stream */
+    private $ftp;
 
     public function __construct($host, $login, $password, $port = 21)
     {
@@ -58,7 +58,7 @@ class Ftp
             ftp_close($ftpStream);
 
             if ($loginResult === false) {
-                $message = "Could not login to $host:$port\n with login:$login and password:$password";
+                $message = "Could not login to with $login:$password\n";
 
                 throw new FtpLoginException($message, FtpLoginException::FTP_LOGIN_CODE);
             }
@@ -105,4 +105,48 @@ class Ftp
 
         ftp_pasv($this->ftp, $this->passiveMode);
     }
+
+    #region Getters & Setters
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogin()
+    {
+        return $this->login;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isPassiveMode()
+    {
+        return $this->passiveMode;
+    }
+
+    #endregion
 }
