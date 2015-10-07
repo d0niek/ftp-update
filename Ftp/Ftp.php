@@ -118,22 +118,22 @@ class Ftp
      */
     public function getFile($localFile, $remoteFile, $mode, $position = 0)
     {
+        $result = false;
+
         if ($this->fileExists($remoteFile)) {
-            $ftpGet = @ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
+            $result = @ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
 
             // That means the local file is in directory that not exists yet
-            if (!$ftpGet) {
+            if (!$result) {
                 $dir = substr($localFile, 0, strrpos($localFile, '/'));
 
                 mkdir($dir, 0777, true);
 
-                return ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
+                $result = ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
             }
-
-            return true;
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -148,22 +148,22 @@ class Ftp
      */
     public function putFile($remoteFile, $localFile, $mode, $position = 0)
     {
+        $result = false;
+
         if (file_exists($localFile)) {
-            $ftpPut = @ftp_put($this->ftp, $remoteFile, $localFile, $mode, $position);
+            $result = @ftp_put($this->ftp, $remoteFile, $localFile, $mode, $position);
 
             // That means the ftp file should be in directory that not exists yet
-            if (!$ftpPut) {
+            if (!$result) {
                 $dir = substr($remoteFile, 0, strrpos($remoteFile, '/'));
 
                 $this->makeDir($dir);
 
-                return ftp_put($this->ftp, $remoteFile, $localFile, $mode);
+                $result = ftp_put($this->ftp, $remoteFile, $localFile, $mode);
             }
-
-            return true;
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -175,19 +175,19 @@ class Ftp
      */
     public function makeDir($dir)
     {
-        $ftpDir = @ftp_mkdir($this->ftp, $dir);
+        $result = @ftp_mkdir($this->ftp, $dir);
 
-        if (!$ftpDir) {
+        if (!$result) {
             $parentDir = substr($dir, 0, strrpos($dir, '/'));
 
-            $ftpDir = $this->makeDir($parentDir);
+            $result = $this->makeDir($parentDir);
 
-            if ($ftpDir) {
-                $ftpDir = ftp_mkdir($this->ftp, $dir);
+            if ($result) {
+                $result = ftp_mkdir($this->ftp, $dir);
             }
         }
 
-        return $ftpDir;
+        return $result;
     }
 
     /**
