@@ -23,7 +23,7 @@ class Ftp
     private $password;
 
     /** @var bool $passiveMode */
-    private $passiveMode = false;
+    private $passiveMode = true;
 
     /** @var resource $ftp FTP stream */
     private $ftp;
@@ -106,6 +106,102 @@ class Ftp
         ftp_pasv($this->ftp, $this->passiveMode);
     }
 
+    /**
+     * Gets file from ftp and save it in the local file
+     *
+     * @param string $localFile
+     * @param string $remoteFile
+     * @param int $mode
+     * @param int $position
+     *
+     * @return bool
+     */
+    public function getFile($localFile, $remoteFile, $mode, $position = 0)
+    {
+        if ($this->fileExists($remoteFile)) {
+            $ftpGet = @ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
+
+            // That means the local file is in directory that not exists yet
+            if (!$ftpGet) {
+                $dir = substr($localFile, 0, strrpos($localFile, '/'));
+
+                mkdir($dir, 0777, true);
+
+                return ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Puts local file to the ftp
+     *
+     * @param string $remoteFile
+     * @param string $localFile
+     * @param int $mode
+     * @param int $position
+     *
+     * @return bool
+     */
+    public function putFile($remoteFile, $localFile, $mode, $position = 0)
+    {
+        if (file_exists($localFile)) {
+            $ftpPut = @ftp_put($this->ftp, $remoteFile, $localFile, $mode, $position);
+
+            // That means the ftp file should be in directory that not exists yet
+            if (!$ftpPut) {
+                $dir = substr($remoteFile, 0, strrpos($remoteFile, '/'));
+
+                $this->makeDir($dir);
+
+                return ftp_put($this->ftp, $remoteFile, $localFile, $mode);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Makes directory on the ftp
+     *
+     * @param string $dir
+     *
+     * @return string
+     */
+    public function makeDir($dir)
+    {
+        $ftpDir = @ftp_mkdir($this->ftp, $dir);
+
+        if (!$ftpDir) {
+            $parentDir = substr($dir, 0, strrpos($dir, '/'));
+
+            $ftpDir = $this->makeDir($parentDir);
+
+            if ($ftpDir) {
+                $ftpDir = ftp_mkdir($this->ftp, $dir);
+            }
+        }
+
+        return $ftpDir;
+    }
+
+    /**
+     * Checks if file exists on the ftp
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function fileExists($file)
+    {
+        return @ftp_rename($this->ftp, $file, $file);
+    }
+
     #region Getters & Setters
 
     /**
@@ -148,5 +244,5 @@ class Ftp
         return $this->passiveMode;
     }
 
-    #endregion
+    #endregion Getters & Setters
 }
