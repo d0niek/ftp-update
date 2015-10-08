@@ -27,6 +27,13 @@ class FtpTest extends PHPUnit_Framework_TestCase
     public static function tearDownAfterClass()
     {
         if (self::$ftp instanceof Ftp) {
+            // Cleanup ftp after tests
+            self::$ftp->removeFile('file.txt');
+            self::$ftp->removeFile('dir/notExists/yet/file.txt');
+            self::$ftp->removeDir('dir/notExists/yet');
+            self::$ftp->removeDir('dir/notExists');
+            self::$ftp->removeDir('dir');
+
             self::$ftp->close();
         }
     }
