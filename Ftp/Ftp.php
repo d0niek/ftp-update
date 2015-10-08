@@ -72,7 +72,7 @@ class Ftp
     }
 
     /**
-     * Logs in to an FTP connection
+     * Logs in to an FTP and turns passive mode on
      *
      * @throws \Ftp\FtpConnectionException
      * @throws \Ftp\FtpLoginException
@@ -123,9 +123,9 @@ class Ftp
         if ($this->fileExists($remoteFile)) {
             $result = @ftp_get($this->ftp, $localFile, $remoteFile, $mode, $position);
 
-            // That means the local file is in directory that not exists yet
+            // That means the local file's directory not exists yet
             if (!$result) {
-                $dir = substr($localFile, 0, strrpos($localFile, '/'));
+                $dir = dirname($localFile);
 
                 mkdir($dir, 0777, true);
 
@@ -153,9 +153,9 @@ class Ftp
         if (file_exists($localFile)) {
             $result = @ftp_put($this->ftp, $remoteFile, $localFile, $mode, $position);
 
-            // That means the ftp file should be in directory that not exists yet
+            // That means the ftp file's directory not exists yet
             if (!$result) {
-                $dir = substr($remoteFile, 0, strrpos($remoteFile, '/'));
+                $dir = dirname($remoteFile);
 
                 $this->makeDir($dir);
 
@@ -177,8 +177,9 @@ class Ftp
     {
         $result = @ftp_mkdir($this->ftp, $dir);
 
+        // That means the parent directory not exists yet
         if (!$result) {
-            $parentDir = substr($dir, 0, strrpos($dir, '/'));
+            $parentDir = dirname($dir);
 
             $result = $this->makeDir($parentDir);
 
