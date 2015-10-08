@@ -1,0 +1,7 @@
+<?php
+return [
+    'host' => '',
+    'port' => 21,
+    'login' => '',
+    'password' => '',
+];

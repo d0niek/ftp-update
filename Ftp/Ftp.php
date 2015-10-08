@@ -48,11 +48,11 @@ class Ftp
      * @throws \Ftp\FtpConnectionException
      * @throws \Ftp\FtpLoginException
      */
-    public function valid($host, $login, $password, $port = 21)
+    public static function valid($host, $login, $password, $port = 21)
     {
         $ftpStream = @ftp_connect($host, $port);
 
-        if ($this->ftp !== false) {
+        if ($ftpStream !== false) {
             $loginResult = @ftp_login($ftpStream, $login, $password);
 
             ftp_close($ftpStream);
@@ -80,7 +80,7 @@ class Ftp
     public function login()
     {
         if ($this->valid($this->host, $this->login, $this->password, $this->port)) {
-            $this->ftp = @ftp_connect($this->host, $this->port);
+            $this->ftp = ftp_connect($this->host, $this->port);
 
             ftp_login($this->ftp, $this->login, $this->password);
 
@@ -107,7 +107,31 @@ class Ftp
     }
 
     /**
-     * Gets file from ftp and save it in the local file
+     * Gets the current directory name
+     *
+     * @return string
+     */
+    public function pwd()
+    {
+        return ftp_pwd($this->ftp);
+    }
+
+    /**
+     * Lists specific directory on the ftp
+     *
+     * @param string $dir
+     */
+    public function listDir($dir)
+    {
+        $files = ftp_nlist($this->ftp, $dir);
+
+        foreach ($files as $file) {
+            echo "$file\n";
+        }
+    }
+
+    /**
+     * Gets file from ftp and save it into the local file
      *
      * @param string $localFile
      * @param string $remoteFile
@@ -116,7 +140,7 @@ class Ftp
      *
      * @return bool
      */
-    public function getFile($localFile, $remoteFile, $mode, $position = 0)
+    public function getFile($localFile, $remoteFile, $mode = FTP_ASCII, $position = 0)
     {
         $result = false;
 
@@ -146,7 +170,7 @@ class Ftp
      *
      * @return bool
      */
-    public function putFile($remoteFile, $localFile, $mode, $position = 0)
+    public function putFile($remoteFile, $localFile, $mode = FTP_ASCII, $position = 0)
     {
         $result = false;
 
