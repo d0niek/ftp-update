@@ -31,7 +31,6 @@ class FtpTest extends PHPUnit_Framework_TestCase
         }
     }
 
-
     public function testValidation()
     {
         extract(self::$ftpConfig);
@@ -109,6 +108,36 @@ class FtpTest extends PHPUnit_Framework_TestCase
     public function testGetFileFromFtp()
     {
         $ftp = $this->getFtp();
+
+        $localFile = __DIR__ . '/file.txt';
+
+        $this->assertFalse(file_exists($localFile));
+        $this->assertTrue($ftp->getFile($localFile, 'file.txt'));
+        $this->assertTrue(file_exists($localFile));
+
+        unlink($localFile);
+    }
+
+    public function testGetFileFromTheFtpToTheDirectoryThatNotExistsYet()
+    {
+        $ftp = $this->getFtp();
+
+        $localFile = __DIR__ . '/dir/notExists/yet/file.txt';
+
+        $this->assertFalse(file_exists($localFile));
+        $this->assertTrue($ftp->getFile($localFile, 'file.txt'));
+        $this->assertTrue(file_exists($localFile));
+
+        unlink($localFile);
+        rmdir(dirname($localFile));
+    }
+
+    public function testGetNotExistingFileFromTheFtp()
+    {
+        $ftp = $this->getFtp();
+
+        $this->assertFalse($ftp->fileExists('file_not_exists.txt'));
+        $this->assertFalse($ftp->getFile('local_file.txt', 'file_not_exists.txt'));
     }
 
     /**
