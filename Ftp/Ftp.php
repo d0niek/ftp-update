@@ -191,6 +191,18 @@ class Ftp
     }
 
     /**
+     * Removes file from the FTP server
+     *
+     * @param string $remoteFile
+     *
+     * @return bool
+     */
+    public function removeFile($remoteFile)
+    {
+        return ftp_delete($this->ftp, $remoteFile);
+    }
+
+    /**
      * Makes directory on the ftp
      *
      * @param string $dir
@@ -213,6 +225,18 @@ class Ftp
         }
 
         return $result;
+    }
+
+    /**
+     * Removes directory from the ftp
+     *
+     * @param string $dir
+     *
+     * @return bool
+     */
+    public function removeDir($dir)
+    {
+        return ftp_rmdir($this->ftp, $dir);
     }
 
     /**
