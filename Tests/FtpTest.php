@@ -21,13 +21,17 @@ class FtpTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$ftpConfig = require_once(__DIR__ . '/ftp.config.php');
+        self::$ftpConfig = require_once(__DIR__ . '/../config/ftp.config.php');
+
+        touch(__DIR__ . '/file_to_upload.txt');
     }
 
     public static function tearDownAfterClass()
     {
         if (self::$ftp instanceof Ftp) {
             // Cleanup ftp after tests
+            unlink(__DIR__ . '/file_to_upload.txt');
+
             self::$ftp->removeFile('file.txt');
             self::$ftp->removeFile('dir/notExists/yet/file.txt');
             self::$ftp->removeDir('dir/notExists/yet');
@@ -89,7 +93,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
     {
         $ftp = $this->getFtp();
 
-        $this->assertTrue($ftp->putFile('file.txt', __DIR__ . '/ftp.config.php.dist'));
+        $this->assertTrue($ftp->putFile('file.txt', __DIR__ . '/file_to_upload.txt'));
         $this->assertTrue($ftp->fileExists('file.txt'));
     }
 
@@ -100,7 +104,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
         $file = 'dir/notExists/yet/file.txt';
 
         $this->assertFalse($ftp->fileExists(dirname($file)));
-        $this->assertTrue($ftp->putFile($file, __DIR__ . '/ftp.config.php.dist'));
+        $this->assertTrue($ftp->putFile($file, __DIR__ . '/file_to_upload.txt'));
         $this->assertTrue($ftp->fileExists($file));
     }
 
@@ -136,7 +140,9 @@ class FtpTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(file_exists($localFile));
 
         unlink($localFile);
-        rmdir(dirname($localFile));
+        rmdir(__DIR__ . '/dir/notExists/yet');
+        rmdir(__DIR__ . '/dir/notExists');
+        rmdir(__DIR__ . '/dir');
     }
 
     public function testGetNotExistingFileFromTheFtp()
