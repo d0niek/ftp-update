@@ -1,6 +1,13 @@
 <?php
+/**
+ * This file is a template file with ftp config.
+ * Leave this file on the repository for other project contributors.
+ *
+ * Copy it without extension *.dist, setup your ftp connection and run test
+ */
+
 return [
-    'host' => '',
+    'host' => '127.0.0.1',
     'port' => 21,
     'login' => '',
     'password' => '',
