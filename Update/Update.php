@@ -50,8 +50,10 @@ class Update
             }
 
             // Add files if they were modified after last update
-            if (is_file($sourcePath) && filemtime($sourcePath) > $lastUpdate) {
-                $files[] =  $sourcePath;
+            if (is_file($sourcePath)) {
+                if (filemtime($sourcePath) > $lastUpdate) {
+                    $files[] = $sourcePath;
+                }
             } else {
                 $paths = array_merge($paths, $this->getFilesFromDirectory($sourcePath, $lastUpdate));
             }
