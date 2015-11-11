@@ -88,6 +88,10 @@ foreach ($files as $file) {
     }
 }
 
+echo "Save new update time...\n";
+file_put_contents(LOCAL_UPDATE, $updateTime);
+$ftp->putFile('update', LOCAL_UPDATE);
+
 if (file_exists(FTP_UPDATE)) {
     unlink(FTP_UPDATE);
 }
