@@ -74,6 +74,7 @@ class Update
         $isIgnored = false;
 
         foreach ($ignoredFiles as $ignoredFile) {
+            // Ignore comments
             if (strpos($ignoredFile, '#') === 0) {
                 continue;
             }
