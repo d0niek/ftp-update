@@ -11,27 +11,9 @@ require_once 'config/config.php';
 use Update\Update;
 use Ftp\Ftp;
 
-echo "Gets time of last update from local file\n";
-$localLastUpdate = file_exists(LOCAL_UPDATE) ? (int) file_get_contents(LOCAL_UPDATE) : 0;
-
-echo "Gets list of ignored files\n";
-$ignoredFiles = file_exists(IGNORE_FILES) ?
-    file(IGNORE_FILES, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) :
-    [];
-
-// Add ftp-update script to ignore list
-$ignoredFiles[] = 'ftp-update';
-
-$update = new Update();
-$modifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ignoredFiles);
-
-echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
-foreach ($modifiedFiles as $modifiedFile) {
-    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
-}
-
 $ftp = new Ftp(HOST, LOGIN, PASSWORD, PORT);
 
+echo "Login to the ftp\n";
 $ftp->login();
 
 if (!$ftp->chdir(PROJECT_PATH)) {
@@ -42,10 +24,32 @@ if (!$ftp->chdir(PROJECT_PATH)) {
     $ftp->chdir(PROJECT_PATH);
 }
 
+$ignoredFiles = file_exists(IGNORE_FILES) ?
+    file(IGNORE_FILES, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) :
+    [];
+
+// Add ftp-update script to ignore list
+$ignoredFiles[] = 'ftp-update';
+
+$update = new Update();
+
 echo "Gets time of last update from ftp file\n";
 $ftpLastUpdate = $ftp->getFile(FTP_UPDATE, 'update') ? (int) file_get_contents(FTP_UPDATE) : 0;
+$ftpModifiedFiles = $update->modifiedFiles(SOURCE_PATH, $ftpLastUpdate, $ignoredFiles);
 
-echo date('d-m-Y', $ftpLastUpdate) . PHP_EOL;
+echo 'Modified files from last ftp update (' . date('d-m-Y', $ftpLastUpdate) . "):\n";
+foreach ($ftpModifiedFiles as $modifiedFile) {
+    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
+}
+
+echo "Gets time of last update from local file\n";
+$localLastUpdate = file_exists(LOCAL_UPDATE) ? (int) file_get_contents(LOCAL_UPDATE) : 0;
+$localModifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ignoredFiles);
+
+echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
+foreach ($localModifiedFiles as $modifiedFile) {
+    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
+}
 
 unlink(FTP_UPDATE);
 $ftp->close();
