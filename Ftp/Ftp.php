@@ -116,6 +116,18 @@ class Ftp
     }
 
     /**
+     * Changes the current directory on a FTP server
+     *
+     * @param string $dir
+     *
+     * @return bool
+     */
+    public function chdir($dir)
+    {
+        return @ftp_chdir($this->ftp, $dir);
+    }
+
+    /**
      * Lists specific directory on the ftp
      *
      * @param string $dir
