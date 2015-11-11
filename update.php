@@ -17,7 +17,7 @@ echo "Login to the ftp\n";
 $ftp->login();
 
 if (!$ftp->chdir(PROJECT_PATH)) {
-    echo 'Directory ' . PROJECT_PATH . "doesn't exists on the ftp.\n";
+    echo 'Directory ' . PROJECT_PATH . " doesn't exists on the ftp.\n";
     echo "Creating directory on the ftp ...\n";
 
     $ftp->makeDir(PROJECT_PATH);
@@ -38,18 +38,70 @@ $ftpLastUpdate = $ftp->getFile(FTP_UPDATE, 'update') ? (int) file_get_contents(F
 $ftpModifiedFiles = $update->modifiedFiles(SOURCE_PATH, $ftpLastUpdate, $ignoredFiles);
 
 echo 'Modified files from last ftp update (' . date('d-m-Y', $ftpLastUpdate) . "):\n";
-foreach ($ftpModifiedFiles as $modifiedFile) {
-    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
-}
+listFiles($ftpModifiedFiles);
 
 echo "Gets time of last update from local file\n";
 $localLastUpdate = file_exists(LOCAL_UPDATE) ? (int) file_get_contents(LOCAL_UPDATE) : 0;
 $localModifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ignoredFiles);
 
 echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
-foreach ($localModifiedFiles as $modifiedFile) {
-    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
+listFiles($localModifiedFiles);
+
+do {
+    echo 'Which time you want to use to do updates (local, ftp): ';
+
+    $option = rtrim(fgets(STDIN), "\n");
+} while ($option !== 'local' && $option !== 'ftp');
+
+$updateTime = time();
+$backupDirectory = __DIR__ . '/update-history/' . date('d-m-Y H.i', $updateTime);
+mkdir($backupDirectory, 0777, true);
+
+if ($option === 'local') {
+    $files = $localModifiedFiles;
+    $messageLog = 'Last update before this ' . date('d-m-Y H:i', $localLastUpdate) . ' (local time)';
+} else {
+    $files = $ftpModifiedFiles;
+    $messageLog = 'Last update before this ' . date('d-m-Y H:i', $ftpLastUpdate) . ' (ftp time)';
 }
 
-unlink(FTP_UPDATE);
+file_put_contents("$backupDirectory/backup.log", "$messageLog\n\n");
+
+echo "Backups files before update...\n";
+foreach ($files as $file) {
+    $file = substr($file, strlen(SOURCE_PATH));
+    $ftpFile = $ftp->pwd() . $file;
+
+    if ($ftp->getFile("$backupDirectory$file", $ftpFile)) {
+        echo "    $ftpFile\n";
+        file_put_contents("$backupDirectory/backup.log", "Backup: $ftpFile\n", FILE_APPEND);
+    }
+}
+
+echo "Update files on the ftp...\n";
+foreach ($files as $file) {
+    $ftpFile = $ftp->pwd() . substr($file, strlen(SOURCE_PATH));
+
+    if ($ftp->putFile($ftpFile, $file)) {
+        echo "    $file\n";
+        file_put_contents("$backupDirectory/backup.log", "Update: $file\n", FILE_APPEND);
+    }
+}
+
+if (file_exists(FTP_UPDATE)) {
+    unlink(FTP_UPDATE);
+}
+
 $ftp->close();
+
+/**
+ * Lists files from array
+ *
+ * @param array $files
+ */
+function listFiles($files)
+{
+    foreach ($files as $modifiedFile) {
+        echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
+    }
+}
