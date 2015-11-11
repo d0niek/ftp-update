@@ -11,4 +11,5 @@ return [
     'port' => 21,
     'login' => '',
     'password' => '',
+    'projectPath' => '',
 ];
