@@ -1,0 +1,15 @@
+# Contains list of files which will not be check for update.
+# Leave this file on the repository for other project contributors.
+#
+# Copy it without extension *.dist and setup your ignored files
+# Base path for ignored files is .. directory (/path/to/project/ftp-update/..)
+#
+# To add file to ignore list write its name start from base path
+# Example:
+
+fileName
+directoryName
+directory/fileName
+directory/subdirectory/fileName
+
+vendor
