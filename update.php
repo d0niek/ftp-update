@@ -6,24 +6,13 @@
  */
 
 require_once 'vendor/autoload.php';
+require_once 'config/config.php';
 
-/**
- * Local file to store last update time
- */
-define('LOCAL_UPDATE', __DIR__ . '/update');
-
-/**
- * Ignore files list. Will no be update
- */
-define('IGNORE_FILES', __DIR__ . '/ignore');
-
-/**
- * Source of files to update
- */
-define('SOURCE_PATH', dirname(__DIR__));
+use Update\Update;
+use Ftp\Ftp;
 
 echo "Gets time of last update from local file\n";
-$localLastUpdate = file_exists(LOCAL_UPDATE) ? file_get_contents(LOCAL_UPDATE) : 0;
+$localLastUpdate = file_exists(LOCAL_UPDATE) ? (int) file_get_contents(LOCAL_UPDATE) : 0;
 
 echo "Gets list of ignored files\n";
 $ignoredFiles = file_exists(IGNORE_FILES) ?
@@ -33,10 +22,30 @@ $ignoredFiles = file_exists(IGNORE_FILES) ?
 // Add ftp-update script to ignore list
 $ignoredFiles[] = 'ftp-update';
 
-$update = new \Update\Update();
+$update = new Update();
 $modifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ignoredFiles);
 
 echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
 foreach ($modifiedFiles as $modifiedFile) {
     echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
 }
+
+$ftp = new Ftp(HOST, LOGIN, PASSWORD, PORT);
+
+$ftp->login();
+
+if (!$ftp->chdir(PROJECT_PATH)) {
+    echo 'Directory ' . PROJECT_PATH . "doesn't exists on the ftp.\n";
+    echo "Creating directory on the ftp ...\n";
+
+    $ftp->makeDir(PROJECT_PATH);
+    $ftp->chdir(PROJECT_PATH);
+}
+
+echo "Gets time of last update from ftp file\n";
+$ftpLastUpdate = $ftp->getFile(FTP_UPDATE, 'update') ? (int) file_get_contents(FTP_UPDATE) : 0;
+
+echo date('d-m-Y', $ftpLastUpdate) . PHP_EOL;
+
+unlink(FTP_UPDATE);
+$ftp->close();
