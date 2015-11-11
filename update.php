@@ -1,53 +1,32 @@
 <?php
+/**
+ * User: d0niek
+ * Date: 11/11/15
+ * Time: 2:32 PM
+ */
 
-$pass = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '';
-$server = '';
-$user = '';
+require_once 'vendor/autoload.php';
 
-// Init ftp connection
-echo "FTP connecting ...\n";
-$ftp = ftp_init($server, $user, $pass);
-if (!$ftp) {
-    echo "Error ftp init\n";
-    exit();
-}
+/**
+ * Local file to store last update time
+ */
+define('LOCAL_UPDATE', __DIR__ . '/update');
 
-$source_path = 'source/trunk';
-$backupDir = 'backup/' . date('dmY_Hi');
+/**
+ * Ignore files list. Will no be update
+ */
+define('IGNORE_FILES', __DIR__ . '/ignore');
 
-@ file_put_contents("$backupDir/backup.log", "Backuo log:\n", FILE_APPEND);
+echo "Gets time of last update from local file\n";
+$localLastUpdate = file_exists(LOCAL_UPDATE) ? file_get_contents(LOCAL_UPDATE) : 0;
 
-require_once(dirname(__FILE__) . '/ftp.php');
-require_once(dirname(__FILE__) . '/modifiedFiles.php');
+echo "Gets list of ignored files\n";
+$ignoredFiles = file_exists(IGNORE_FILES) ?
+    file(IGNORE_FILES, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) :
+    [];
 
-// Get last update time
-echo "Get last update time ...\n";
-ftp_get($ftp, 'update.log', '/update.log', FTP_ASCII);
-$lastUpdate = strtotime(file_get_contents('update.log'));
+// Add ftp-update script to ignore list
+$ignoredFiles[] = 'ftp-update';
 
-// Get newer files since the last update
-echo "Get newer files list since the last update ...\n";
-$execute = array();
-$files = modifiedFiles($source_path, $lastUpdate, $execute);
-
-echo "Backup old files and update newer ...\n";
-foreach ($files as $file) {
-    $ftpFiles = substr($file, strlen($source_path));
-
-    if (ftp_getFile($ftp, "$backupDir$ftpFiles", $ftpFiles, FTP_ASCII)) {
-        echo "    Backup << $ftpFiles\n";
-        file_put_contents("$backupDir/backup.log", "Backup: $ftpFiles\n", FILE_APPEND);
-    }
-
-    if (ftp_putFile($ftp, $ftpFiles, "$source_path$ftpFiles", FTP_ASCII)) {
-        echo "    Update >> $source_path$ftpFiles\n";
-        file_put_contents("$backupDir/backup.log", "Update: $source_path$ftpFiles\n", FILE_APPEND);
-    }
-}
-
-// Update time
-echo "Save new update time ...\n";
-file_put_contents('update.log', date('Y-m-d H:i', time()));
-ftp_putFile($ftp, '/update.log', 'update.log', FTP_ASCII);
-
-ftp_quit($ftp);
+$update = new \Update\Update();
+$modifiedFiles = $update->modifiedFiles(dirname(__DIR__), $localLastUpdate, $ignoredFiles);

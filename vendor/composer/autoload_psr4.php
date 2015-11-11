@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'Ftp\\' => array($baseDir . '/Ftp'),
     'Tests\\' => array($baseDir . '/Tests'),
+    'Update\\' => array($baseDir . '/Update'),
 );
