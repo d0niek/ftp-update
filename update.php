@@ -17,6 +17,11 @@ define('LOCAL_UPDATE', __DIR__ . '/update');
  */
 define('IGNORE_FILES', __DIR__ . '/ignore');
 
+/**
+ * Source of files to update
+ */
+define('SOURCE_PATH', dirname(__DIR__));
+
 echo "Gets time of last update from local file\n";
 $localLastUpdate = file_exists(LOCAL_UPDATE) ? file_get_contents(LOCAL_UPDATE) : 0;
 
@@ -29,4 +34,9 @@ $ignoredFiles = file_exists(IGNORE_FILES) ?
 $ignoredFiles[] = 'ftp-update';
 
 $update = new \Update\Update();
-$modifiedFiles = $update->modifiedFiles(dirname(__DIR__), $localLastUpdate, $ignoredFiles);
+$modifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ignoredFiles);
+
+echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
+foreach ($modifiedFiles as $modifiedFile) {
+    echo '    ' . substr($modifiedFile, strlen(SOURCE_PATH) + 1) . "\n";
+}
