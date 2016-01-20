@@ -5,6 +5,11 @@ Installations
 -------------
 Download and put files from repository into ftp-update directory in root directory of your project.
 
+Download composer (from [here](https://getcomposer.org/)) to the ftp-update folder and run
+```bash
+$ php composer.phar install
+```
+
 Go to /path/to/project/ftp-update/config copy ftp.config.php.dist file and past in the same location 
 but without dist extension.
 
