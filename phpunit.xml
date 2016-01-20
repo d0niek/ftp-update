@@ -2,8 +2,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="vendor/autoload.php"
-        >
+         bootstrap="vendor/autoload.php">
     <php>
         <ini name="intl.default_locale" value="en"/>
         <ini name="intl.error_level" value="0"/>
@@ -12,12 +11,12 @@
 
     <testsuites>
         <testsuite name="TicTactToe Test Suite">
-            <directory>./Tests/</directory>
+            <directory>./src/Tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory>./Tests/</directory>
+            <directory>./src/Tests/</directory>
         </whitelist>
     </filter>
 </phpunit>

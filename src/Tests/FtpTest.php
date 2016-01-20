@@ -20,7 +20,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$ftpConfig = require_once(__DIR__ . '/../config/ftp.config.php');
+        self::$ftpConfig = require_once(__DIR__ . '/../../config/ftp.config.php');
 
         touch(__DIR__ . '/file_to_upload.txt');
     }

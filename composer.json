@@ -1,0 +1,15 @@
+{
+    "name": "d0niek/ftp-update",
+    "description": "Update modified files via ftp",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "d0niek",
+            "email": "damianglinkowski@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"": "src/"}
+    },
+    "require": {}
+}
