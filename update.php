@@ -47,6 +47,12 @@ $localModifiedFiles = $update->modifiedFiles(SOURCE_PATH, $localLastUpdate, $ign
 echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate) . "):\n";
 listFiles($localModifiedFiles);
 
+if (empty($ftpModifiedFiles) && empty($localModifiedFiles)) {
+    echo "\nGreat! Nothing to update!\n";
+
+    exit;
+}
+
 do {
     echo 'Which time you want to use to do updates (local, ftp, exit): ';
 
