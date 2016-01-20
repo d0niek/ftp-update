@@ -1,5 +1,5 @@
 # ftp-update
-Update only modified files via ftp
+Update modified files via ftp
 
 Installations
 -------------
@@ -17,7 +17,7 @@ Setup yours ftp data such as host, login, password, port and path to where scrip
 
 Tests
 -----
-When you setup ftp data now you can run tests to check if everything work correctly. Run
+Download phpunit (from [here](https://phpunit.de/)) to the ftp-update folder and run
 ```bash
 $ php phpunit.phar
 ```
