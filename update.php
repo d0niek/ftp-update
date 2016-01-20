@@ -48,9 +48,15 @@ echo 'Modified files from last local update (' . date('d-m-Y', $localLastUpdate)
 listFiles($localModifiedFiles);
 
 do {
-    echo 'Which time you want to use to do updates (local, ftp): ';
+    echo 'Which time you want to use to do updates (local, ftp, exit): ';
 
     $option = rtrim(fgets(STDIN), "\n");
+
+    if ($option === 'exit') {
+        $ftp->close();
+
+        exit;
+    }
 } while ($option !== 'local' && $option !== 'ftp');
 
 $updateTime = time();
