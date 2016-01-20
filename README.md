@@ -62,9 +62,9 @@ After will take local update time and list all local files modified since this t
 
 Then you have to choice by which time you want to make update
 ```bash
-Which time you want to use to do updates (local, ftp): ftp
+Which time you want to use to do updates (local, ftp or exit): ftp
 ```
-write local or ftp and press Enter.
+write local, ftp (or exit script) and press Enter.
 
 According to chosen option script first will make backup from ftp (if files exists) and after that will
 upload new modified files.

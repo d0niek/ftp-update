@@ -54,7 +54,7 @@ if (empty($ftpModifiedFiles) && empty($localModifiedFiles)) {
 }
 
 do {
-    echo 'Which time you want to use to do updates (local, ftp, exit): ';
+    echo 'Which time you want to use to do updates (local, ftp or exit): ';
 
     $option = rtrim(fgets(STDIN), "\n");
 
