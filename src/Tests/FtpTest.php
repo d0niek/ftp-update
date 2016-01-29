@@ -15,12 +15,26 @@ class FtpTest extends PHPUnit_Framework_TestCase
     /** @var \Ftp\Ftp|null $ftp */
     private static $ftp = null;
 
-    /** @var array $ftpConfig */
-    protected static $ftpConfig;
+    /** @var string $host */
+    protected static $host;
+
+    /** @var string $login */
+    protected static $login;
+
+    /** @var string $password */
+    protected static $password;
+
+    /** @var int $port */
+    protected static $port;
 
     public static function setUpBeforeClass()
     {
-        self::$ftpConfig = require_once(__DIR__ . '/../../config/ftp.config.php');
+        $ftpConfig = require_once(__DIR__ . '/../../config/ftp.config.php');
+
+        self::$host = $ftpConfig['host'];
+        self::$login = $ftpConfig['login'];
+        self::$password = $ftpConfig['password'];
+        self::$port = $ftpConfig['port'];
 
         touch(__DIR__ . '/file_to_upload.txt');
     }
@@ -43,9 +57,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
 
     public function testValidation()
     {
-        extract(self::$ftpConfig);
-
-        $this->assertTrue(Ftp::valid($host, $login, $password, $port));
+        $this->assertTrue(Ftp::valid(self::$host, self::$login, self::$password, self::$port));
     }
 
     /**
@@ -53,9 +65,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
      */
     public function testValidConnectionHost()
     {
-        extract(self::$ftpConfig);
-
-        Ftp::valid($host . 'wrong_host', $login, $password, $port);
+        Ftp::valid(self::$host . 'wrong_host', self::$login, self::$password, self::$port);
     }
 
     /**
@@ -63,9 +73,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
      */
     public function testValidConnectionPort()
     {
-        extract(self::$ftpConfig);
-
-        Ftp::valid($host, $login, $password, $port + 21);
+        Ftp::valid(self::$host, self::$login, self::$password, self::$port + 21);
     }
 
     /**
@@ -73,9 +81,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
      */
     public function testValidLoginLogin()
     {
-        extract(self::$ftpConfig);
-
-        Ftp::valid($host, $login . 'wrong_login', $password, $port);
+        Ftp::valid(self::$host, self::$login . 'wrong_login', self::$password, self::$port);
     }
 
     /**
@@ -83,9 +89,7 @@ class FtpTest extends PHPUnit_Framework_TestCase
      */
     public function testValidLoginPassword()
     {
-        extract(self::$ftpConfig);
-
-        Ftp::valid($host, $login, $password . 'wrong_password', $port);
+        Ftp::valid(self::$host, self::$login, self::$password . 'wrong_password', self::$port);
     }
 
     public function testPutFileOnFtp()
@@ -152,18 +156,21 @@ class FtpTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($ftp->getFile('local_file.txt', 'file_not_exists.txt'));
     }
 
+    #region Getters
+
     /**
      * @return \Ftp\Ftp
      */
     private function getFtp()
     {
         if (self::$ftp === null) {
-            extract(self::$ftpConfig);
+            self::$ftp = new Ftp(self::$host, self::$login, self::$password, self::$port);
 
-            self::$ftp = new Ftp($host, $login, $password, $port);
             self::$ftp->login();
         }
 
         return self::$ftp;
     }
+
+    #endregion
 }
