@@ -5,7 +5,7 @@ Installations
 -------------
 Download and put files from repository into ftp-update directory in root directory of your project.
 
-Download composer (from [here](https://getcomposer.org/)) to the ftp-update folder and run
+Download composer (from [here](https://getcomposer.org/)) to the ftp-update folder and run:
 ```bash
 $ php composer.phar install
 ```
@@ -17,7 +17,7 @@ Setup yours ftp data such as host, login, password, port and path to where scrip
 
 Tests
 -----
-Download phpunit (from [here](https://phpunit.de/)) to the ftp-update folder and run
+Download phpunit (from [here](https://phpunit.de/)) to the ftp-update folder and run:
 ```bash
 $ php phpunit.phar
 ```
@@ -47,11 +47,11 @@ Lines start with # is a comment
 
 Run update
 ----------
-Open command line and go to project root
+Open command line and go to project root:
 ```bash
 $ cd /path/to/project
 ```
-and run command
+and run command:
 ```bash
 $ php ftp-update/update.php
 ```
@@ -60,7 +60,7 @@ all local files modified since this time.
 
 After will take local update time and list all local files modified since this time.
 
-Then you have to choice by which time you want to make update
+Then you have to choice by which time you want to make update:
 ```bash
 Which time you want to use to do updates (local, ftp or exit): ftp
 ```
